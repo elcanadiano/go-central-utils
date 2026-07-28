@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "db:migrate": "tsx src/db/migrate.ts",
-    "db:status": "tsx src/db/status.ts"
+    "db:status": "tsx src/db/status.ts",
+    "import:songs": "tsx src/scripts/import-songs.ts"
   },
   "keywords": [],
   "author": "",
