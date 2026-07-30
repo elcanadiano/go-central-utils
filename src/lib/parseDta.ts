@@ -53,7 +53,8 @@ function tokenize(input: string): string[] {
           if (next == null) {
             throw new Error("Unterminated escape in DTA string");
           }
-          value += next;
+          // Harmonix DTA uses \q for a literal double-quote character.
+          value += next === "q" ? '"' : next;
           i += 2;
           continue;
         }
