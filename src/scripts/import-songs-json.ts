@@ -104,7 +104,7 @@ async function importSongs(filePath: string): Promise<void> {
 const fileArg = process.argv[2];
 
 if (!fileArg) {
-  console.error("Usage: pnpm import:songs <path-to-songs.json>");
+  console.error("Usage: pnpm import:songs-json <path-to-songs.json>");
   process.exit(1);
 }
 

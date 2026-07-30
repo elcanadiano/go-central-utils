@@ -6,7 +6,7 @@
   "scripts": {
     "db:migrate": "tsx src/db/migrate.ts",
     "db:status": "tsx src/db/status.ts",
-    "import:songs": "tsx src/scripts/import-songs.ts"
+    "import:songs-json": "tsx src/scripts/import-songs-json.ts"
   },
   "keywords": [],
   "author": "",
