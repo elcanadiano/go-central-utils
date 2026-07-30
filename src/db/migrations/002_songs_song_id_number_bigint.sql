@@ -1,0 +1,2 @@
+ALTER TABLE songs
+  ALTER COLUMN song_id_number TYPE BIGINT;
