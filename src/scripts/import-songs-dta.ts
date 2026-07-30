@@ -1,53 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { closeDb, sql } from "../db/client.js";
+import { closeDb } from "../db/client.js";
 import { mapDtaGenre } from "../lib/dtaGenres.js";
 import { extractDtaSongs, parseDta } from "../lib/parseDta.js";
+import { type SongRow, upsertSongs } from "../lib/songs.js";
 import { toSortTitle } from "../lib/toSortTitle.js";
-
-type SongRow = {
-  song_id_number: number;
-  song_id: string | null;
-  album: string | null;
-  album2: string | null;
-  artist: string | null;
-  artist2: string | null;
-  genre: string | null;
-  name: string | null;
-  name2: string | null;
-};
-
-const COLUMNS = [
-  "song_id_number",
-  "song_id",
-  "album",
-  "album2",
-  "artist",
-  "artist2",
-  "genre",
-  "name",
-  "name2",
-] as const;
-
-const BATCH_SIZE = 500;
 
 function sortTitleOrNull(value: string | null): string | null {
   return value == null ? null : toSortTitle(value);
-}
-
-async function upsertBatch(rows: SongRow[]): Promise<void> {
-  await sql`
-    INSERT INTO songs ${sql(rows, ...COLUMNS)}
-    ON CONFLICT (song_id_number) DO UPDATE SET
-      song_id = EXCLUDED.song_id,
-      album = EXCLUDED.album,
-      album2 = EXCLUDED.album2,
-      artist = EXCLUDED.artist,
-      artist2 = EXCLUDED.artist2,
-      genre = EXCLUDED.genre,
-      name = EXCLUDED.name,
-      name2 = EXCLUDED.name2
-  `;
 }
 
 async function importSongsDta(filePath: string): Promise<void> {
@@ -86,13 +46,7 @@ async function importSongsDta(filePath: string): Promise<void> {
       (duplicateCount > 0 ? ` (${duplicateCount} duplicate song_id(s) collapsed)` : "") +
       "...",
   );
-
-  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-    const batch = rows.slice(i, i + BATCH_SIZE);
-    await upsertBatch(batch);
-    console.log(`Upserted ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length}`);
-  }
-
+  await upsertSongs(rows);
   console.log("Done.");
 }
 
