@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { closeDb } from "../db/client.js";
-import { type SongRow, upsertSongs } from "../lib/songs.js";
+import { type SongRow, parseSongImportArgs, upsertSongs } from "../lib/songs.js";
 
 function asNullableString(value: unknown): string | null {
   if (value == null) {
@@ -40,7 +40,10 @@ function mapSong(raw: unknown, index: number): SongRow {
   };
 }
 
-async function importSongs(filePath: string): Promise<void> {
+async function importSongs(
+  filePath: string,
+  options: { doNothing: boolean },
+): Promise<void> {
   const absolutePath = path.resolve(filePath);
   const raw = await readFile(absolutePath, "utf8");
   const parsed: unknown = JSON.parse(raw);
@@ -50,20 +53,23 @@ async function importSongs(filePath: string): Promise<void> {
   }
 
   const rows = parsed.map((item, index) => mapSong(item, index));
-  console.log(`Importing ${rows.length} song(s) from ${absolutePath}...`);
-  await upsertSongs(rows);
+  const mode = options.doNothing ? "do-nothing" : "upsert";
+  console.log(`Importing ${rows.length} song(s) from ${absolutePath} (${mode})...`);
+  await upsertSongs(rows, options);
   console.log("Done.");
 }
 
-const fileArg = process.argv[2];
+const { filePath, doNothing } = parseSongImportArgs(process.argv.slice(2));
 
-if (!fileArg) {
-  console.error("Usage: pnpm import:songs-json <path-to-songs.json>");
+if (!filePath) {
+  console.error(
+    "Usage: pnpm import:songs-json <path-to-songs.json> [-dn|--do-nothing]",
+  );
   process.exit(1);
 }
 
 try {
-  await importSongs(fileArg);
+  await importSongs(filePath, { doNothing });
 } finally {
   await closeDb();
 }

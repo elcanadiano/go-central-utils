@@ -24,9 +24,25 @@ export const SONG_COLUMNS = [
   "name2",
 ] as const;
 
+export type UpsertSongsOptions = {
+  /** If true, skip existing rows instead of updating them. */
+  doNothing?: boolean;
+};
+
 const BATCH_SIZE = 500;
 
-export async function upsertBatch(rows: SongRow[]): Promise<void> {
+export async function upsertBatch(
+  rows: SongRow[],
+  options: UpsertSongsOptions = {},
+): Promise<void> {
+  if (options.doNothing) {
+    await sql`
+      INSERT INTO songs ${sql(rows, ...SONG_COLUMNS)}
+      ON CONFLICT (song_id_number) DO NOTHING
+    `;
+    return;
+  }
+
   await sql`
     INSERT INTO songs ${sql(rows, ...SONG_COLUMNS)}
     ON CONFLICT (song_id_number) DO UPDATE SET
@@ -42,10 +58,25 @@ export async function upsertBatch(rows: SongRow[]): Promise<void> {
 }
 
 /** Upsert songs in batches, logging progress. */
-export async function upsertSongs(rows: SongRow[]): Promise<void> {
+export async function upsertSongs(
+  rows: SongRow[],
+  options: UpsertSongsOptions = {},
+): Promise<void> {
+  const action = options.doNothing ? "Inserted" : "Upserted";
+
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
-    await upsertBatch(batch);
-    console.log(`Upserted ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length}`);
+    await upsertBatch(batch, options);
+    console.log(`${action} ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length}`);
   }
+}
+
+/** Parse shared import CLI flags: `<file> [-dn|--do-nothing]` */
+export function parseSongImportArgs(argv: string[]): {
+  filePath: string | undefined;
+  doNothing: boolean;
+} {
+  const doNothing = argv.includes("-dn") || argv.includes("--do-nothing");
+  const filePath = argv.find((arg) => !arg.startsWith("-"));
+  return { filePath, doNothing };
 }

@@ -3,14 +3,17 @@ import path from "node:path";
 import { closeDb } from "../db/client.js";
 import { mapDtaGenre } from "../lib/dtaGenres.js";
 import { extractDtaSongs, parseDta } from "../lib/parseDta.js";
-import { type SongRow, upsertSongs } from "../lib/songs.js";
+import { type SongRow, parseSongImportArgs, upsertSongs } from "../lib/songs.js";
 import { toSortTitle } from "../lib/toSortTitle.js";
 
 function sortTitleOrNull(value: string | null): string | null {
   return value == null ? null : toSortTitle(value);
 }
 
-async function importSongsDta(filePath: string): Promise<void> {
+async function importSongsDta(
+  filePath: string,
+  options: { doNothing: boolean },
+): Promise<void> {
   const absolutePath = path.resolve(filePath);
   const raw = await readFile(absolutePath, "utf8");
   const parsed = parseDta(raw);
@@ -41,24 +44,27 @@ async function importSongsDta(filePath: string): Promise<void> {
   }
 
   const rows = [...byId.values()];
+  const mode = options.doNothing ? "do-nothing" : "upsert";
   console.log(
-    `Importing ${rows.length} song(s) from ${absolutePath}` +
+    `Importing ${rows.length} song(s) from ${absolutePath} (${mode})` +
       (duplicateCount > 0 ? ` (${duplicateCount} duplicate song_id(s) collapsed)` : "") +
       "...",
   );
-  await upsertSongs(rows);
+  await upsertSongs(rows, options);
   console.log("Done.");
 }
 
-const fileArg = process.argv[2];
+const { filePath, doNothing } = parseSongImportArgs(process.argv.slice(2));
 
-if (!fileArg) {
-  console.error("Usage: pnpm import:songs-dta <path-to-song_map.dta>");
+if (!filePath) {
+  console.error(
+    "Usage: pnpm import:songs-dta <path-to-song_map.dta> [-dn|--do-nothing]",
+  );
   process.exit(1);
 }
 
 try {
-  await importSongsDta(fileArg);
+  await importSongsDta(filePath, { doNothing });
 } finally {
   await closeDb();
 }
