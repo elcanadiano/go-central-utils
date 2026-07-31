@@ -116,3 +116,56 @@ export function parseSongImportArgs(argv: string[]): {
   const filePath = argv.find((arg) => !arg.startsWith("-"));
   return { filePath, doNothing };
 }
+
+/** Parse API import CLI flags: `[-dn|--do-nothing] [-y|--yes]` */
+export function parseSongsApiImportArgs(argv: string[]): {
+  doNothing: boolean;
+  yes: boolean;
+} {
+  return {
+    doNothing: argv.includes("-dn") || argv.includes("--do-nothing"),
+    yes: argv.includes("-y") || argv.includes("--yes"),
+  };
+}
+
+/**
+ * Guard for dangerous API upserts that can null out existing metadata.
+ * Returns true if the import should proceed.
+ */
+export async function confirmSongsApiUpsert(options: {
+  doNothing: boolean;
+  yes: boolean;
+}): Promise<boolean> {
+  if (options.doNothing) {
+    return true;
+  }
+
+  const warning = [
+    "WARNING: Running without --do-nothing will upsert song_id_number rows",
+    "and may clear existing song_id / name / artist / album / genre fields",
+    "for IDs already in the database.",
+  ].join("\n");
+
+  console.warn(warning);
+
+  if (options.yes) {
+    console.warn("Continuing because --yes was passed.");
+    return true;
+  }
+
+  if (!process.stdin.isTTY) {
+    console.error(
+      "Refusing upsert in non-interactive mode. Pass -dn/--do-nothing or -y/--yes.",
+    );
+    return false;
+  }
+
+  const { createInterface } = await import("node:readline/promises");
+  const rl = createInterface({ input: process.stdin, output: process.stderr });
+  try {
+    const answer = await rl.question("Continue? [y/N] ");
+    return /^y(es)?$/i.test(answer.trim());
+  } finally {
+    rl.close();
+  }
+}
