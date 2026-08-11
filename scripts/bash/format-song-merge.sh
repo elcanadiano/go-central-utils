@@ -26,7 +26,8 @@ if [[ ! -d "$root_dir" ]]; then
 fi
 
 root_dir=$(cd -- "$root_dir" && pwd)
-cd -- "$root_dir"
+utf8_py=$root_dir/utf-8.py
+song_merge=$root_dir/song_merge
 
 if ! command -v arson-fmt >/dev/null 2>&1; then
   echo "arson-fmt is not on PATH." >&2
@@ -38,19 +39,19 @@ if ! command -v python >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ ! -f ./utf-8.py ]]; then
+if [[ ! -f "$utf8_py" ]]; then
   echo "utf-8.py not found in $root_dir" >&2
   exit 1
 fi
 
-if [[ ! -d ./song_merge ]]; then
+if [[ ! -d "$song_merge" ]]; then
   echo "song_merge directory not found in $root_dir" >&2
   exit 1
 fi
 
 files=()
 shopt -s nullglob
-for file in ./song_merge/songs\ *.dta; do
+for file in "$song_merge"/songs\ *.dta; do
   [[ -f "$file" ]] || continue
   base=$(basename -- "$file")
   if [[ "$base" =~ ^songs\ [0-9]+\.dta$ ]]; then
@@ -67,10 +68,9 @@ fi
 mapfile -t files < <(printf '%s\n' "${files[@]}" | LC_ALL=C sort -t' ' -k2,2n)
 
 for file in "${files[@]}"; do
-  rel=${file#./}
-  echo "Processing $rel"
-  arson-fmt "$rel"
-  python utf-8.py "$rel"
+  echo "Processing $file"
+  arson-fmt "$file"
+  python "$utf8_py" "$file"
 done
 
 echo

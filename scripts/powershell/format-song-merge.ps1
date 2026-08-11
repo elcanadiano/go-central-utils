@@ -21,7 +21,6 @@ if (-not (Test-Path -LiteralPath $Directory -PathType Container)) {
 }
 
 $rootDir = (Resolve-Path -LiteralPath $Directory).Path
-Set-Location -LiteralPath $rootDir
 
 if (-not (Get-Command arson-fmt -ErrorAction SilentlyContinue)) {
     Write-Error "arson-fmt is not on PATH."
@@ -52,10 +51,9 @@ if ($files.Count -eq 0) {
 }
 
 foreach ($file in $files) {
-    $rel = ".\song_merge\$($file.Name)"
-    Write-Host "Processing $rel"
-    & arson-fmt $rel
-    & python utf-8.py $rel
+    Write-Host "Processing $($file.FullName)"
+    & arson-fmt $file.FullName
+    & python $utf8Py $file.FullName
 }
 
 Write-Host ""
