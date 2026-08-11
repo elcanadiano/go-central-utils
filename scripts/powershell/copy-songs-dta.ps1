@@ -65,7 +65,7 @@ foreach ($dir in $dirs) {
         continue
     }
 
-    if (-not (Test-Path -LiteralPath $songsDta -PathType File)) {
+    if (-not (Test-Path -LiteralPath $songsDta -PathType Leaf)) {
         Write-Host "Skipping $($dir.Name): songs/ exists but songs.dta is missing."
         $skipped++
         continue

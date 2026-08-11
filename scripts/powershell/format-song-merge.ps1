@@ -28,7 +28,7 @@ if (-not (Get-Command arson-fmt -ErrorAction SilentlyContinue)) {
 }
 
 $utf8Py = Join-Path $rootDir "utf8.py"
-if (-not (Test-Path -LiteralPath $utf8Py -PathType File)) {
+if (-not (Test-Path -LiteralPath $utf8Py -PathType Leaf)) {
     Write-Error "utf8.py not found in $rootDir"
 }
 
