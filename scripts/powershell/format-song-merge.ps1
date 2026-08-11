@@ -1,9 +1,9 @@
-# Run arson-fmt and utf8.py on each numbered songs N.dta file in song_merge/.
+# Run arson-fmt and utf-8.py on each numbered songs N.dta file in song_merge/.
 #
 # Usage: .\scripts\powershell\format-song-merge.ps1 <directory>
 #
 # Expects:
-#   <directory>\utf8.py
+#   <directory>\utf-8.py
 #   <directory>\song_merge\songs 1.dta
 #   <directory>\song_merge\songs 2.dta
 #   ...
@@ -27,9 +27,9 @@ if (-not (Get-Command arson-fmt -ErrorAction SilentlyContinue)) {
     Write-Error "arson-fmt is not on PATH."
 }
 
-$utf8Py = Join-Path $rootDir "utf8.py"
+$utf8Py = Join-Path $rootDir "utf-8.py"
 if (-not (Test-Path -LiteralPath $utf8Py -PathType Leaf)) {
-    Write-Error "utf8.py not found in $rootDir"
+    Write-Error "utf-8.py not found in $rootDir"
 }
 
 $songMerge = Join-Path $rootDir "song_merge"
@@ -51,7 +51,7 @@ foreach ($file in $files) {
     $rel = "song_merge/$($file.Name)"
     Write-Host "Processing $rel"
     & arson-fmt $rel
-    & .\utf8.py $rel
+    & .\utf-8.py $rel
 }
 
 Write-Host ""

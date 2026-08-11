@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Run arson-fmt and utf8.py on each numbered songs N.dta file in song_merge/.
+# Run arson-fmt and utf-8.py on each numbered songs N.dta file in song_merge/.
 #
 # Usage: scripts/bash/format-song-merge.sh <directory>
 #
 # Expects:
-#   <directory>/utf8.py
+#   <directory>/utf-8.py
 #   <directory>/song_merge/songs 1.dta
 #   <directory>/song_merge/songs 2.dta
 #   ...
@@ -33,8 +33,8 @@ if ! command -v arson-fmt >/dev/null 2>&1; then
   exit 1
 fi
 
-if [[ ! -f ./utf8.py ]]; then
-  echo "utf8.py not found in $root_dir" >&2
+if [[ ! -f ./utf-8.py ]]; then
+  echo "utf-8.py not found in $root_dir" >&2
   exit 1
 fi
 
@@ -65,7 +65,7 @@ for file in "${files[@]}"; do
   rel=${file#./}
   echo "Processing $rel"
   arson-fmt "$rel"
-  ./utf8.py "$rel"
+  ./utf-8.py "$rel"
 done
 
 echo
