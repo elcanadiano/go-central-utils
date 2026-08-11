@@ -2,7 +2,7 @@
 # Collect songs.dta files from each source subdirectory into numbered copies
 # in the target directory (songs 1.dta, songs 2.dta, ...).
 #
-# Usage: scripts/copy-songs-dta.sh <source-dir> <target-dir>
+# Usage: scripts/bash/copy-songs-dta.sh <source-dir> <target-dir>
 set -euo pipefail
 
 usage() {

@@ -1,7 +1,7 @@
 # Collect songs.dta files from each source subdirectory into numbered copies
 # in the target directory (songs 1.dta, songs 2.dta, ...).
 #
-# Usage: .\scripts\copy-songs-dta.ps1 <source-dir> <target-dir>
+# Usage: .\scripts\powershell\copy-songs-dta.ps1 <source-dir> <target-dir>
 
 param(
     [Parameter(Mandatory = $true, Position = 0)]
