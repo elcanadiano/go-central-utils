@@ -1,4 +1,5 @@
-# Run arson-fmt and utf-8.py on each numbered songs N.dta file in song_merge/.
+# Run arson-fmt on each numbered songs N.dta file in song_merge/, then utf-8.py
+# once on the song_merge directory.
 #
 # Usage: .\scripts\powershell\format-song-merge.ps1 <directory>
 #
@@ -51,10 +52,12 @@ if ($files.Count -eq 0) {
 }
 
 foreach ($file in $files) {
-    Write-Host "Processing $($file.FullName)"
+    Write-Host "Formatting $($file.FullName)"
     & arson-fmt $file.FullName
-    & python $utf8Py $file.FullName
 }
 
+Write-Host "Converting $songMerge to UTF-8"
+& python $utf8Py $songMerge
+
 Write-Host ""
-Write-Host "Done. Processed $($files.Count) file(s)."
+Write-Host "Done. Formatted $($files.Count) file(s)."

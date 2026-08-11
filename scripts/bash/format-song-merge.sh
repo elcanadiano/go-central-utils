@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Run arson-fmt and utf-8.py on each numbered songs N.dta file in song_merge/.
+# Run arson-fmt on each numbered songs N.dta file in song_merge/, then utf-8.py
+# once on the song_merge directory.
 #
 # Usage: scripts/bash/format-song-merge.sh <directory>
 #
@@ -68,10 +69,12 @@ fi
 mapfile -t files < <(printf '%s\n' "${files[@]}" | LC_ALL=C sort -t' ' -k2,2n)
 
 for file in "${files[@]}"; do
-  echo "Processing $file"
+  echo "Formatting $file"
   arson-fmt "$file"
-  python "$utf8_py" "$file"
 done
 
+echo "Converting $song_merge to UTF-8"
+python "$utf8_py" "$song_merge"
+
 echo
-echo "Done. Processed ${#files[@]} file(s)."
+echo "Done. Formatted ${#files[@]} file(s)."
