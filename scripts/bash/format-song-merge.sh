@@ -8,7 +8,7 @@
 #   <directory>/song_merge/songs 1.dta
 #   <directory>/song_merge/songs 2.dta
 #   ...
-# and that arson-fmt is on PATH.
+# and that arson-fmt and python are on PATH.
 set -euo pipefail
 
 usage() {
@@ -30,6 +30,11 @@ cd -- "$root_dir"
 
 if ! command -v arson-fmt >/dev/null 2>&1; then
   echo "arson-fmt is not on PATH." >&2
+  exit 1
+fi
+
+if ! command -v python >/dev/null 2>&1; then
+  echo "python is not on PATH." >&2
   exit 1
 fi
 
@@ -65,7 +70,7 @@ for file in "${files[@]}"; do
   rel=${file#./}
   echo "Processing $rel"
   arson-fmt "$rel"
-  ./utf-8.py "$rel"
+  python utf-8.py "$rel"
 done
 
 echo

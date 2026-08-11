@@ -7,7 +7,7 @@
 #   <directory>\song_merge\songs 1.dta
 #   <directory>\song_merge\songs 2.dta
 #   ...
-# and that arson-fmt is on PATH.
+# and that arson-fmt and python are on PATH.
 
 param(
     [Parameter(Mandatory = $true, Position = 0)]
@@ -25,6 +25,10 @@ Set-Location -LiteralPath $rootDir
 
 if (-not (Get-Command arson-fmt -ErrorAction SilentlyContinue)) {
     Write-Error "arson-fmt is not on PATH."
+}
+
+if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+    Write-Error "python is not on PATH."
 }
 
 $utf8Py = Join-Path $rootDir "utf-8.py"
@@ -48,10 +52,10 @@ if ($files.Count -eq 0) {
 }
 
 foreach ($file in $files) {
-    $rel = "song_merge/$($file.Name)"
+    $rel = ".\song_merge\$($file.Name)"
     Write-Host "Processing $rel"
     & arson-fmt $rel
-    & .\utf-8.py $rel
+    & python utf-8.py $rel
 }
 
 Write-Host ""
