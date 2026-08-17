@@ -123,3 +123,9 @@ on existing rows and prompts for confirmation unless you pass `-y` / `--yes`.
 
 GoCentralScores supports searching on a song ID. As a result, this is an option just to add songs
 without metadata.
+
+## Creating a DTA file for import
+
+The [dta_format.md](./dta_format.md) file provides a guide which allows you to grab all the
+`song.dta` files from your `USRDIR` directory in RPCS3 and automates some of the `arson-fmt` setup
+in order to make the file transfer easier.
