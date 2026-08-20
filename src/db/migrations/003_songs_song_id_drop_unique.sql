@@ -1,0 +1,1 @@
+ALTER TABLE songs DROP CONSTRAINT IF EXISTS songs_song_id_key;
