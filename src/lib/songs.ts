@@ -57,42 +57,6 @@ export async function upsertBatch(
   `;
 }
 
-/**
- * Delete existing rows that share a song_id slug with an incoming row but use a
- * different song_id_number (e.g. JSON catalog IDs superseded by DTA).
- * Returns the removed rows.
- */
-export async function removeConflictingSongIds(
-  rows: SongRow[],
-): Promise<{ song_id_number: number; song_id: string }[]> {
-  const incoming = rows.filter(
-    (row): row is SongRow & { song_id: string } => row.song_id != null,
-  );
-
-  if (incoming.length === 0) {
-    return [];
-  }
-
-  const deleted: { song_id_number: number; song_id: string }[] = [];
-
-  for (let i = 0; i < incoming.length; i += BATCH_SIZE) {
-    const batch = incoming.slice(i, i + BATCH_SIZE);
-    const pairs = batch.map((row) => [row.song_id, row.song_id_number]);
-
-    const batchDeleted = await sql<{ song_id_number: number; song_id: string }[]>`
-      DELETE FROM songs AS s
-      USING (VALUES ${sql(pairs)}) AS incoming(song_id, song_id_number)
-      WHERE s.song_id = incoming.song_id::text
-        AND s.song_id_number IS DISTINCT FROM incoming.song_id_number::bigint
-      RETURNING s.song_id_number, s.song_id
-    `;
-
-    deleted.push(...batchDeleted);
-  }
-
-  return deleted;
-}
-
 /** Upsert songs in batches, logging progress. */
 export async function upsertSongs(
   rows: SongRow[],

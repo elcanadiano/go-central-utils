@@ -68,7 +68,7 @@ The main table is `songs`:
 | Column               | Notes                  |
 | -------------------- | ---------------------- |
 | `song_id_number`     | Primary key (`BIGINT`) |
-| `song_id`            | Optional unique slug   |
+| `song_id`            | Optional slug (not unique) |
 | `album` / `album2`   | Display + sort title   |
 | `artist` / `artist2` | Display + sort title   |
 | `genre`              | Genre string           |
@@ -104,8 +104,7 @@ pnpm import:songs-dta path/to/song_map.dta -dn
 ```
 
 Parses a Rock Band-style DTA song map, maps genres, and derives `name2` / `artist2` / `album2` sort
-titles. Also removes existing rows that share a `song_id` slug with a different `song_id_number`
-(DTA wins).
+titles. Upserts only on `song_id_number`; the same `song_id` slug may exist on multiple rows.
 
 Those with large song counts can build a master `.dta` file using
 [Arson](https://github.com/hmxmilohax/arson) for use of importing using this script.

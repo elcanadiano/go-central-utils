@@ -6,7 +6,6 @@ import { extractDtaSongs, parseDta } from "../lib/parseDta.js";
 import {
   type SongRow,
   parseSongImportArgs,
-  removeConflictingSongIds,
   upsertSongs,
 } from "../lib/songs.js";
 import { toSortTitle } from "../lib/toSortTitle.js";
@@ -55,16 +54,6 @@ async function importSongsDta(
       (duplicateCount > 0 ? ` (${duplicateCount} duplicate song_id(s) collapsed)` : "") +
       "...",
   );
-
-  const removed = await removeConflictingSongIds(rows);
-  if (removed.length > 0) {
-    console.log(
-      `Removed ${removed.length} existing row(s) with the same song_id but a different song_id_number (preferring DTA):`,
-    );
-    for (const row of removed) {
-      console.log(`  - ${row.song_id} (song_id_number ${row.song_id_number})`);
-    }
-  }
 
   await upsertSongs(rows, options);
   console.log("Done.");
