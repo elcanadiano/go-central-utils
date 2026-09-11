@@ -16,6 +16,7 @@ function createSql() {
   if (databaseUrl) {
     return postgres(databaseUrl, {
       ssl: "require",
+      connect_timeout: 8,
     });
   }
 
@@ -48,6 +49,7 @@ function createSql() {
     password,
     database,
     ssl: isLocalHost(host!) ? undefined : "require",
+    connect_timeout: 8,
   });
 }
 

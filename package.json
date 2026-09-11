@@ -8,7 +8,12 @@
     "db:status": "tsx src/db/status.ts",
     "import:songs-json": "tsx src/scripts/import-songs-json.ts",
     "import:songs-dta": "tsx src/scripts/import-songs-dta.ts",
-    "import:songs-api": "tsx src/scripts/import-songs-api.ts"
+    "import:songs-api": "tsx src/scripts/import-songs-api.ts",
+    "seed:users": "tsx src/scripts/seed-users.ts",
+    "seed:bands": "tsx src/scripts/seed-bands.ts",
+    "seed:scores": "tsx src/scripts/seed-scores.ts",
+    "seed:battles": "tsx src/scripts/seed-battles.ts",
+    "seed:battle-scores": "tsx src/scripts/seed-battle-scores.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +28,7 @@
   "type": "module",
   "dependencies": {
     "dotenv": "^17.4.2",
+    "mongodb": "^7.6.0",
     "postgres": "^3.4.9"
   },
   "devDependencies": {
